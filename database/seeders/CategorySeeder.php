@@ -21,22 +21,25 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $this->disableForeignKeys();
-        $categoryFile = Storage::disk('seeders')->path('import/category.csv');
-        $csv = new CsvIterator($categoryFile);
+        $file = 'import/category.csv';
+        if (Storage::disk('seeders')->exists($file)) {
+            $categoryFile = Storage::disk('seeders')->path($file);
+            $csv = new CsvIterator($categoryFile);
 
-        $fields = [];
-        foreach ($csv as $key => $row) {
-            if (empty($row)) {
-                continue;
-            }
-            if ($key === 1) {
-                $fields = $row;
-            } else {
-                $insertData = array_combine(array_values($fields), array_values($row));
-                Category::firstOrCreate(
-                    ['id' => $insertData['id']],
-                    $insertData
-                );
+            $fields = [];
+            foreach ($csv as $key => $row) {
+                if (empty($row)) {
+                    continue;
+                }
+                if ($key === 1) {
+                    $fields = $row;
+                } else {
+                    $insertData = array_combine(array_values($fields), array_values($row));
+                    Category::firstOrCreate(
+                        ['id' => $insertData['id']],
+                        $insertData
+                    );
+                }
             }
         }
         $this->enableForeignKeys();
